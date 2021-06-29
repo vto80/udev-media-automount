@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 #$1 = <dev>
 
 # Default options to use for mounting
 AUTOMOUNT_OPTS='errors=remount-ro,relatime,utf8,user'
 # Default type to use for mounting
 AUTOMOUNT_TYPE='auto'
+# Added random delay 0.000-3.000 seconds
+DELAY=$(echo "scale=3 ; $((RANDOM % 3000)) / 1000" | bc)
 
 # Directory to look for type-specific settings
 confdir=/etc/media-automount.d
@@ -91,8 +93,13 @@ then
 	source "$confdir/auto"
 fi
 
+log "Waiting $DELAY seconds before creating mountpoint $AUTOMOUNT_DIR for $dev ..."
+sleep $DELAY
+
 log "mounting device $dev in $AUTOMOUNT_DIR"
 mkdir -p "$AUTOMOUNT_DIR"
+sleep .5
+
 if mount -t "$AUTOMOUNT_TYPE" -o "$AUTOMOUNT_OPTS" "$dev" "$AUTOMOUNT_DIR"
 then
     # Notify
